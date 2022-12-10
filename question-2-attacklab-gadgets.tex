@@ -1,0 +1,34 @@
+\subsection{Gadget farms}
+
+\subsubsection{What is a gadget farm?}
+
+``Gadgets'' are something used in return-oriented programming to execute code that already exists in a program rather than injecting new code.
+
+An assembly program is represented by bytes. The CPU cannot tell the difference between a byte that was meant to be an instruction and a byte that was meant to be data. For example, the following is the object dump of my \code{getbuf} function from Attack Lab:
+
+\begin{minted}{text}
+000000000040267e <getbuf>:
+  40267e:       f3 0f 1e fa             endbr64
+  402682:       48 83 ec 28             sub    $0x28,%rsp
+  402686:       48 89 e7                mov    %rsp,%rdi
+  402689:       e8 b5 02 00 00          callq  402943 <Gets>
+  40268e:       b8 01 00 00 00          mov    $0x1,%eax
+  402693:       48 83 c4 28             add    $0x28,%rsp
+  402697:       c3                      retq
+\end{minted}
+
+The intended instructions are listed line by line. However, if we have control over where the program will jump (for example by overwriting the base pointer), we can tell the CPU to execute instructions that were not ``intended'' to be there. For example, we can make the CPU execute the \code{ec} byte from the above assembly as an instruction by jumping to the address \code{0x402684}.
+
+\begin{minted}{text}
+  402682:       48 83 ec 28             sub    $0x28,%rsp
+                      ^^
+                     here
+\end{minted}
+
+In this case, it's just a useless instruction that ``inputs a byte from the I/O port in DX into AL''.\footnote{Source: \url{https://c9x.me/x86/html/file_module_x86_id_139.html}} With return-oriented programming, you attempt to find sequences of bytes in the assembly that execute instructions to your liking, which are then shortly followed by a \code{c3} byte. The \code{c3} byte, as described earlier, encodes the \code{ret} instruction. 
+
+Recall that \code{ret} jumps to the address currently on top of the stack.
+Therefore, if you have control of the stack, you can write addresses of multiple gadgets onto the stack that are then executed sequentially. When each gadget finishes, it \texttt{ret}s to the next address on the stack.
+
+The gadget farm, in short, is a collection of all the gadgets we can find in the existing program code: addresses of groups of small, executable byte sequences that we can compose into larger and more useful gadgets.
+
