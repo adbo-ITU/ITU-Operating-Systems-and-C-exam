@@ -1,0 +1,17 @@
+\subsection{Implementation of \texttt{tmin(void)}}
+
+By two's complement, the smallest number starts with a 1 followed by 0s only. Thus we can obtain the smallest number representable by two's complement by shifting a 1 to the most significant bit's position.
+
+% TODO: Insert figure
+
+When you shift to the left with \code{<<}, all of the ``new'' bits on the right side are set to 0. For example \code{1011 << 2} becomes \code{1100} (assuming there is only space for 4 bits).
+
+My complete implementation of \code{tmin(void)} is as follows:
+
+\begin{minted}{c}
+int tmin(void) {
+  return 1 << 31;
+}
+\end{minted}
+
+Because we are working with 32-bit numbers, shifting a 1 to the left by 31 bits will yield a single 1 in the most significant bit's position and nothing but 0s elsewhere.
