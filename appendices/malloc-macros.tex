@@ -1,0 +1,57 @@
+\section{Constants and macros used to implement \texttt{mm\_malloc}}
+\label{app:malloc-macros}
+
+Some of these are based on the course book \cite[p. 893]{computersystems}.
+
+\bgroup
+\small
+\begin{minted}[bgcolor=LightGray, linenos, breaklines]{c}
+/* single word (4) or double word (8) alignment */
+#define ALIGNMENT 8
+/* rounds up to the nearest multiple of ALIGNMENT */
+#define align(size) (((size) + (ALIGNMENT - 1)) & ~0x7)
+
+#define WSIZE 4             /* Word and header/footer size (bytes) */
+#define DSIZE 8             /* Double word size (bytes) */
+#define CHUNKSIZE (1 << 12) /* Extend heap by this amount (bytes) */
+
+/* Pack a size and allocated bit into a word */
+#define make_header(block_size, is_allocated) ((block_size) | (is_allocated))
+
+/* Read and write a word at address p */
+#define get_val(ptr) (*(unsigned int *)(ptr))
+#define set_val(ptr, val) (*(unsigned int *)(ptr) = (val))
+
+/* Read the size and allocated fields from pointer p */
+#define get_size(ptr) (get_val(ptr) & ~0x7)
+#define is_allocated(ptr) (get_val(ptr) & 0x1)
+#define is_free(ptr) (!(is_allocated(ptr)))
+
+/* Given block ptr bp, compute address of its header and footer. */
+#define get_header_ptr(block_ptr) ((char *)(block_ptr)-WSIZE)
+#define get_footer_ptr(block_ptr) ((char *)(block_ptr) + get_size(get_header_ptr(block_ptr)) - DSIZE)
+
+/* Given block ptr bp, compute address of next and previous blocks */
+#define get_next_block_ptr(block_ptr) ((char *)(block_ptr) + get_size(get_header_ptr(block_ptr)))
+#define get_prev_block_ptr(block_ptr) ((char *)(block_ptr)-get_size(((char *)(block_ptr)-DSIZE)))
+
+// Given a block pointer to a free block, get the free block it points to as the next one
+#define get_next_free_block_ptr(block_ptr) ((void *)get_val(block_ptr))
+// Given a block pointer to a free block, get the free block it points to as the previous one
+#define get_prev_free_block_ptr(block_ptr) ((void *)get_val((char *)(block_ptr) + WSIZE))
+
+/*
+ * Given the size of the data, calculates how many bytes are needed to store the
+ * block:
+ *   - 1 word for header
+ *   - 1 word for footer
+ *   - 8-byte aligned data size
+ */
+#define calc_block_size(data_size) (WSIZE + WSIZE + align(data_size));
+
+#define max(x, y) ((x) > (y) ? (x) : (y))
+#define min(x, y) ((x) < (y) ? (x) : (y))
+
+static int MIN_BLOCK_SIZE = calc_block_size(1);
+\end{minted}
+\egroup

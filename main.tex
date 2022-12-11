@@ -2,6 +2,7 @@
 
 \usepackage[utf8]{inputenc} % Input encoding (allows æ, ø, å  fx)
 \usepackage[T1]{fontenc} % Font encoding
+\usepackage[backend=biber]{biblatex} % source tool
 \usepackage[a4paper]{geometry} % Layout (margins, page size)
 \usepackage{fourier} % Math font
 \usepackage{inconsolata} % Monospace font
@@ -17,12 +18,16 @@
 \usepackage[hidelinks]{hyperref}
 \usepackage{tocbasic}
 
+\addbibresource{sources.bib}
+
 \colorlet{LightGray}{Gray!5!}
 
 \renewcommand*{\thesection}{Question~\arabic{section}:}
 \renewcommand*{\thesubsection}{\arabic{section}.\alph{subsection}}
 % \renewcommand*{\thesubsubsection}{\arabic{section}.\alph{subsection}.\roman{subsubsection}}
 \renewcommand*{\thesubsubsection}{\texttt{\#}}
+
+\newcommand*{\Appendixautorefname}{Appendix}
 
 \DeclareTOCStyleEntry[dynnumwidth=true]{tocline}{section}
 
@@ -69,7 +74,10 @@
   \section{Malloc Lab}
   \input{question-3-malloc.tex}
 
-  % \begin{appendices}
-  %   \input{appendices/app-howmanybits.tex}
-  % \end{appendices}
+  \printbibliography[heading=bibintoc]
+
+  \newpage
+  \begin{appendices}
+    \input{appendices/malloc-macros.tex}
+  \end{appendices}
 \end{document}
