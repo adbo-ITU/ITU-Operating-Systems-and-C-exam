@@ -1,0 +1,63 @@
+\subsection{Pointer arithmetic}
+
+Pointer arithmetic is about performing addition and subtraction on pointers. However, the addition and subtraction behaviour differs depending on the types of the operands. In particular, when adding a number $n$ to a pointer type, the pointer is increased with $n \cdot t$, with $t$ being the size of the type being pointed to in bytes. For example, adding 1 to a \code{char *} pointer increases its value by 1, but adding 1 to an \code{int *} pointer increases its value by 4. The same applies for subtraction. I've created some examples of how adding to a pointer differs depending on the type being pointed to in \autoref{table:pointer-types}.
+
+\begin{table}[H]
+  \centering
+  \begin{tabular}{lll}
+    \toprule
+    Type & Size in bytes & Pointer addition example \\ \midrule
+    \code{char}      & 1 & \code{((char *) 0) + 1 = 0x1} \\
+    \code{short}     & 2 & \code{((short *) 0) + 1 = 0x2} \\
+    \code{int}       & 4 & \code{((int *) 0) + 1 = 0x4} \\
+    \code{long long} & 8 & \code{((long long *) 0) + 1 = 0x8} \\
+    \code{void}      & 1 & \code{((void *) 0) + 1 = 0x1} \\
+    \code{char *}    & 4 & \code{((char **) 0) + 1 = 0x4} \\
+    \bottomrule
+  \end{tabular}
+  \caption{Sizes of primitive types in C and examples of how adding 1 to each pointer type produces different results. The sizes were obtained in GDB with the \code{print sizeof(type)} command. The pointer addition was calculated with \code{print ((type *) 0) + 1}.}
+  \label{table:pointer-types}
+\end{table}
+
+C disallows adding together two pointers because it conceptually doesn't make sense. For example, if you add \code{((char *) 0) + ((char *) 1)} to a C program, it will not compile. You can only add ``normal'' numbers to pointers.
+
+However, C does allow subtraction of two pointers if the pointer types are the same size. Conceptually, the result of this corresponds to how many instances of that type can fit between the two pointees in memory. For example, take these two subtractions in GDB:
+
+\begin{verbatim}
+(gdb) print ((int *) 10) - ((unsigned int *) 1)
+$1 = 2
+(gdb) print ((char *) 10) - ((char *) 1)
+$2 = 9
+\end{verbatim}
+
+Between memory address 10 and 1, you can fit 2 4-byte integers, but in the same memory range, you can fit 9 1-byte characters. Therefore the subtractions yield 2 and 9, respectively.
+
+It's worth mentioning that indexing into an array with \code{arr[i]} is just a syntactic sugar for \code{*(arr + i)}. Arrays are just pointers, and the \texttt{i}th element is located at \code{arr} offset with \code{i} times the size of the array's element type (in bytes).
+
+\subsubsection{How I use pointer arithmetic in \texttt{mm.c}}
+
+Take this example:
+
+\begin{minted}[breaklines]{c}
+#define get_header_ptr(block_ptr) ((char *)(block_ptr)-WSIZE)
+\end{minted}
+
+Here, the given pointer \code{block_ptr} is cast to a \code{char *} so we that when we subtract \code{WSIZE}, we subtract exactly \code{WSIZE} bytes from the pointer. If we did not cast the pointer, the subtraction would depend on the pointer type given by the user. \code{WSIZE} is defined as the constant 4, so the following would have been equivalent:\\\code{(((int *)(block_ptr)) - 1)}.
+
+Another example is how the footer pointer is computed:
+
+\begin{minted}[breaklines]{c}
+#define get_footer_ptr(block_ptr) ((char *)(block_ptr) + get_size(get_header_ptr(block_ptr)) - DSIZE)
+\end{minted}
+
+Similarly, the input pointer is cast to a \code{char *} for granular and more straight-forward pointer arithmetic. When we add \code{get_size(..)} to the block pointer, we add \code{get_size(..)} amount of bytes to the current block pointer --- i.e. we point to the next block. To point at the footer, \code{DSIZE} is subtracted, because subtracting 1 word yields the next block header location, and subtracting another word yields the current block's footer location.
+
+Lastly, I use the below line of code to update a free block's ``previous block pointer'' field:
+
+\begin{minted}[breaklines]{c}
+set_val((char *)(block_ptr) + WSIZE, (unsigned int)next);
+\end{minted}
+
+The block pointer is cast to a \code{char *} so that when we add \code{WSIZE}, we add precisely 4 bytes. Equivalently, I could have written \code{(int *)(block_ptr) + 1}.
+
+More usages of pointer arithmetic can be seen in \autoref{app:malloc-macros} on lines 23-33.
