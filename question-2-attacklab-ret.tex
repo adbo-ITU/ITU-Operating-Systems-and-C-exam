@@ -10,7 +10,7 @@ Assuming the x86 instruction set, \code{ret} does two things:
 What the CPU does in order to achieve the above is:
 
 \begin{enumerate}
-  \item Set the instruction pointer, which is stored in register \texttt{\%eip}\footnote{Source: Control Flow Instructions, \url{https://flint.cs.yale.edu/cs421/papers/x86-asm/asm.html}}, to the value on top of the stack (at the address pointed to by register \texttt{\%rsp}).
+  \item Set the instruction pointer, which is stored in register \texttt{\%eip}~\cite{x86-control-flow}, to the value on top of the stack (at the address pointed to by register \texttt{\%rsp}).
   \item Decrease the stack pointer (in register \texttt{\%rsp}) with the address size (32 bits or 64 bits depending on architecture).
 \end{enumerate}
 

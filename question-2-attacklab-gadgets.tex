@@ -25,7 +25,7 @@ The intended instructions are listed line by line. However, if we have control o
                      here
 \end{minted}
 
-In this case, it's just a useless instruction that ``inputs a byte from the I/O port in DX into AL''.\footnote{Source: \url{https://c9x.me/x86/html/file_module_x86_id_139.html}} With return-oriented programming, you attempt to find sequences of bytes in the assembly that execute instructions to your liking, which are then shortly followed by a \code{c3} byte. The \code{c3} byte, as described earlier, encodes the \code{ret} instruction. 
+In this case, it's just a useless instruction that ``inputs a byte from the I/O port in DX into AL''~\cite{x86-cli-ins}. With return-oriented programming, you attempt to find sequences of bytes in the assembly that execute instructions to your liking, which are then shortly followed by a \code{c3} byte. The \code{c3} byte, as described earlier, encodes the \code{ret} instruction. 
 
 Recall that \code{ret} jumps to the address currently on top of the stack.
 Therefore, if you have control of the stack, you can write addresses of multiple gadgets onto the stack that are then executed sequentially. When each gadget finishes, it \texttt{ret}s to the next address on the stack.
@@ -37,7 +37,7 @@ The gadget farm, in short, is a collection of all the gadgets we can find in the
 To search through the gadget farm, I wrote the part of the \texttt{rtarget} object dump that contained the gadget farm to a file named \code{farm.objdump}. I then tried different exploit ideas and searched the object dump for exploitable byte sequences. Ultimately, I ended up with the following set of gadgets:
 
 \begin{enumerate}
-  \item Pop the top of the stack into the \texttt{\%rax} register. This instruction is encoded as \code{58}\footnote{Source: \url{https://github.itu.dk/pages/OSC/22-Website/labs/attacklab.pdf}}, and I found two viable gadgets as follows:
+  \item Pop the top of the stack into the \texttt{\%rax} register. This instruction is encoded as \code{58}~\cite[p. 10]{attacklab-pdf}, and I found two viable gadgets as follows:
     \begin{minted}[linenos, autogobble]{text}
       $ grep '58' farm.objdump
         4028cf:       c7 07 a1 58 c3 0a       movl   $0xac358a1,(%rdi)
@@ -50,7 +50,7 @@ To search through the gadget farm, I wrote the part of the \texttt{rtarget} obje
 
     The \code{58 c3} sequence starts at the 4th byte after \code{0x4028cf} --- thus the gadget address becomes \code{4028cf + 3 = 4028d2}.
 
-  \item Copy the contents of register \texttt{\%rax} into register \texttt{\%rdi} (because \texttt{\%rdi} holds the first argument to a function). This instruction is encoded as the multibyte sequence \code{48 89 c7}. A usable gadget can be found as follows:
+  \item Copy the contents of register \texttt{\%rax} into register \texttt{\%rdi} (because \texttt{\%rdi} holds the first argument to a function). This instruction is encoded as the multibyte sequence \code{48 89 c7}~\cite[p. 10]{attacklab-pdf}. A usable gadget can be found as follows:
 
     \begin{minted}[linenos, autogobble]{text}
       $ grep '48 89 c7' -A 1 farm.objdump
