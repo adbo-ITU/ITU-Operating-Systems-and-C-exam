@@ -1,0 +1,23 @@
+\subsection{Memory leaks}
+
+The term \textit{memory leak} refers to when a program heap-allocates memory and does not free it. When this is done repeatedly, the program will continuously use more and more memory until there is none left.
+
+It's worth noting that any memory used by a process will be freed once it terminates. Therefore, memory leaks will typically hit long-running programs harder than programs that are run quickly many times.
+
+An example of a function that causes a memory leak is this one:
+
+\begin{minted}[linenos, bgcolor=LightGray]{c}
+char read_first_letter() {
+  char *name = (char *) malloc(128);
+  scanf("%s", name);
+  return name[0];
+}
+\end{minted}
+
+The function simply reads a string from stdin and returns the first character of that string. On line 2, a 128-byte buffer to hold the name is allocated on the heap, but \code{free(name)} is never called. Thus, every time \code{read_first_letter()} is read, a new buffer is allocated and never freed. Over time, if the function is called many times, it may cause issues.
+
+The best way to avoid memory leaks is by cleaning up all heap-allocated resources that have been created with \code{malloc} with a corresponding call to \code{free}.
+
+You can also choose to implement a garbage collector that automatically detects unused memory and frees it. But if you reach that point, perhaps you should reconsider your choice of using C for the task at hand.
+
+In other programming languages that use a garbage collector, memory leaks can be caused by objects that point to each other alongside other reasons. However, I have not covered that here since the C is the scope.
