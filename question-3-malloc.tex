@@ -129,7 +129,7 @@ I didn't mention this earlier, but the heap is demarcated by two small blocks: t
 
 On line 20, the newly allocated block is put onto the explicit free list.
 
-In order to reduce fragmentation when extending the heap and freeing blocks, adjacent free blocks are coalesced into a single free block. This is what happens on line 23.
+To reduce external fragmentation when extending the heap and freeing blocks, adjacent free blocks are coalesced into a single free block. This is what happens on line 23. External fragmentation means that there is enough space in the heap to store a given size, but there is no single block large enough to hold it~\cite[p. 883]{computersystems}.
 
 \subsubsection{Manipulating the free list}
 \label{sec:manipulate-free-list}
