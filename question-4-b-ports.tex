@@ -1,0 +1,43 @@
+\subsection{Ephemeral and well-known ports}
+
+A port is a communication channel which the operating system uses for network communication. However, it should be mentioned that a port is simply a virtual construct that is managed by the OS and not something implemented in hardware~\cite{cloudflare-port}. It's used to uniquely identify a connection or process.
+
+A port is identified as a 16-bit integer, meaning there are $2^{16} = 65536$ different port numbers --- or 65535 if you don't count 0 because it's not permitted.
+
+Well-known ports are ports that are typically used for a specific service/protocol. For example, it is the norm to use port 80 for HTTP traffic and port 443 for HTTPS. The port numbers between 0 and 1023 are reserved as well-known ports~\cite{registered-port}.
+
+Ephemeral ports, on the other hand, are short-lived ports that are used for other purposes. For example, when a client makes a connection to a server, that connection will be through an ephemeral port. The kernel will automatically assign an ephemeral port when it's needed~\cite[p. 966]{computersystems}. Ephemeral ports can use a port number anywhere in the range from 1024 to 65535.
+
+However, that's not to say that only well-known ports can be used for long-lived purposes (such as a server). \textit{Registered} ports can be used for long-lived services whose purpose may not be well-reflected by a well-known port~\cite{registered-port} --- these are in the range 1024-49151. Port numbers above 49151 are only used for dynamic ports, not registered ports.
+
+Some more famous well-known ports are:
+
+\begin{itemize}
+  \item Port 21 for FTP (File Transfer Protocol)
+  \item Port 22 for SSH (Secure Shell Protocol, which we've used in this course to develop on \texttt{cos.itu.dk})
+  \item Port 25 for SMTP (Simple Mail Transfer Protocol)
+\end{itemize}
+
+The \code{/etc/services} file lists which well-known services are assigned to the well-known ports.
+Below, you can see the beginning of the \code{/etc/services} file on my Mac, showing some well-known ports from 1-6 using different protocols.
+
+\begin{minted}[linenos, bgcolor=LightGray]{text}
+rtmp              1/ddp    #Routing Table Maintenance Protocol
+tcpmux            1/udp     # TCP Port Service Multiplexer
+tcpmux            1/tcp     # TCP Port Service Multiplexer
+#                          Mark Lottor <MKL@nisc.sri.com>
+nbp               2/ddp    #Name Binding Protocol
+compressnet       2/udp     # Management Utility
+compressnet       2/tcp     # Management Utility
+compressnet       3/udp     # Compression Process
+compressnet       3/tcp     # Compression Process
+#                          Bernie Volz <VOLZ@PROCESS.COM>
+echo              4/ddp    #AppleTalk Echo Protocol
+#                 4/tcp    Unassigned
+#                 4/udp    Unassigned
+rje               5/udp     # Remote Job Entry
+rje               5/tcp     # Remote Job Entry
+#                          Jon Postel <postel@isi.edu>
+zip               6/ddp    #Zone Information Protocol
+# and 2000 lines more of well-known ports
+\end{minted}
