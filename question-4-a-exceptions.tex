@@ -1,0 +1,15 @@
+\subsection{Exceptions: traps, faults, and aborts}
+
+The very short version of the difference between traps, faults, and aborts is \cite[p. 762]{computersystems}:
+
+\begin{description}[labelindent=1cm]
+  \item[Traps] are expected by the programmer
+  \item[Faults] are not expected (an error), but they can potentially be recovered from
+  \item[Aborts] are not expected, and you cannot recover from them
+\end{description}
+
+All three are examples of synchronous exceptions, meaning they arise directly as the result of executing some instruction. What happens after the exception depends on the type of exception. After a trap handler finishes, control is returned to the next instruction in the program. When a fault occurs, control is transferred to a fault handler~\cite[765]{computersystems}. If the handler can successfully handle the error, the instruction that caused the fault is re-executed. Otherwise, the program is aborted. Aborts always cause the program to be aborted.
+
+As an example, traps are used when making system calls. That is, request that the kernel perform some action and return to the running program afterwards. An example of a fault is a page fault, which happens when a physical page of memory is requested, but that page has not been mapped in virtual memory. This should be one that can be recovered from. Aborts can occur for \textit{many} reasons: division with 0, attempting to access memory outside the program, hardware errors, and many more. Aborts often surface as a ``general protection fault'' (typically presented as a ``segmentation fault'') \cite[p. 765]{computersystems}.
+
+One extra note: an interrupt is another type of exception. It is an \textit{asynchronous} exception, caused by a signal being sent from an I/O device~\cite[p. 762]{computersystems}. For example, a network device may want to state that it has received a new connection request. Interrupts, like traps, also return control to the next instruction in the program~\cite[p. 763]{computersystems}.
