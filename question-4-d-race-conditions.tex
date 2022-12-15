@@ -63,4 +63,4 @@ The Cache Coherence Problem describes the problem of synchronizing values across
 
 However, atomicity is also needed when performing something like a cache invalidation request. Otherwise, multiple cores may try to invalidate each other's caches simultaneously. This can be achieved with bus locking~\cite[slide 55]{concurrencyslides}, which gives a core exclusive access to a specific bus (which could be main memory, an interconnect, or some other bus)~\cite[slide 55]{concurrencyslides}.
 
-If shared data is often accessed and modified by multiple cores, atomic operations can be vulnerable to \textit{cache thrashing}: a (possibly severe) performance reduction caused by cores having excessively synchronize their caches.
+If shared data is often accessed and modified by multiple cores, atomic operations can be vulnerable to \textit{cache thrashing}: a (possibly severe) performance reduction caused by cores having to excessively synchronize their caches.

@@ -43,7 +43,7 @@ The code examples will use macros and constants for pointer arithmetic and utili
 \subsubsection{The explicit free list}
 \label{sec:free-list}
 
-It's possible to find a free block on the heap by iterating over all blocks. However, this takes $O(b)$ time (with $b$ being the amount of blocks). Instead, I've implemented an explicit free list, which uses the payload to store pointers to the next and previous free blocks. Using this is a doubly linked list, it's possible to iterate through only the free blocks on the heap, skipping all already-allocated blocks. The structure of free blocks in my implementation is illustrated on \autoref{fig:free-list-structure}.
+It's possible to find a free block on the heap by iterating over all blocks. However, this takes $O(b)$ time (with $b$ being the amount of blocks). Instead, I've implemented an explicit free list, which uses the payload to store pointers to the next and previous free blocks. Using this as a doubly linked list, it's possible to iterate through only the free blocks on the heap, skipping all already-allocated blocks. The structure of free blocks in my implementation is illustrated on \autoref{fig:free-list-structure}.
 
 \begin{figure}[H]
   \centering
